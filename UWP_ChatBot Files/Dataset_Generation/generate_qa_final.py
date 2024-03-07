@@ -7,7 +7,7 @@ from transformers import AutoTokenizer # For tokenizing text to ChatML format
 
 # Initialize the OpenAI client with an API key for authentication
 client = OpenAI(
-    api_key="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"
+    api_key="" # Use your own API Key here
 )
 
 # Load paragraphs from a JSON file into the 'paragraphs' variable
