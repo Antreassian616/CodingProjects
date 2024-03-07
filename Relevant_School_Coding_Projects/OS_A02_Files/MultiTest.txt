@@ -1,0 +1,129 @@
+// public class MultiThreaded implements Runnable {
+
+//     // The error threshold
+//     private static final double errorThreshold = 5.0;
+//     // 2D array to hold the temperature values of each cell in the matrix
+//     private final double[][] matrix;
+//     // size of the matrix
+//     private final int size;
+//     // Total error shared among threads
+//     private static double totalError = 0;
+
+//     public MultiThreaded(int size) {
+//         this.size = size;
+//         this.matrix = new double[size][size];
+
+//         for (int i = 1; i < size - 1; i++) {
+//             matrix[0][i] = 30; // Top edge
+//             matrix[size - 1][i] = 75; // Bottom edge
+//             matrix[i][0] = 15; // Left edge
+//             matrix[i][size - 1] = 72; // Right edge
+//         }
+
+//         // Initialize corner cells with the given neighbor cells
+//         matrix[0][0] = (15 + 30) / 2.0; // Top left corner
+//         matrix[0][size - 1] = (30 + 72) / 2.0; // Top right corner
+//         matrix[size - 1][0] = (15 + 75) / 2.0; // Bottom left corner
+//         matrix[size - 1][size - 1] = (75 + 72) / 2.0; // Bottom right corner
+
+        
+//     }
+//     @Override
+//     public void run() {
+//         // Variable for iterations.
+//         int iterations = 0;
+
+//         // Iterate through the matrix to fill empty slots until error is low enough
+//         while (true) {
+//             totalError = 0; // Reset total error
+
+//             // Create and start threads
+//             Thread[] threads = new Thread[4];
+//             int chunkSize = size / 4;
+
+//             for (int i = 0; i < 4; i++) {
+//                 int startIndex = i * chunkSize;
+//                 int endIndex = (i == 3) ? size : startIndex + chunkSize;
+
+//                 threads[i] = new Thread(() -> {
+//                     double localError = 0;
+
+//                     int startI = (startIndex == 0) ? 1 : startIndex;
+//                     int endI = (endIndex == size) ? size - 1 : endIndex;
+
+//                     for (int j = startI; j < endI; j++) {
+//                         for (int k = 1; k < size - 1; k++) {
+//                             double oldTemp = matrix[j][k];
+//                             double newTemp = (matrix[j - 1][k] + matrix[j + 1][k] + matrix[j][k - 1] + matrix[j][k + 1]) / 4.0;
+//                             matrix[j][k] = newTemp;
+//                             localError += Math.abs(newTemp - oldTemp);
+//                         }
+//                     }
+
+//                     synchronized (MultiThreaded.class) {
+//                         totalError += localError;
+//                     }
+//                 });
+
+//                 threads[i].start();
+//             }
+
+//             // Wait for all threads to finish
+//             for (Thread thread : threads) {
+//                 try {
+//                     thread.join();
+//                 } catch (InterruptedException e) {
+//                     e.printStackTrace();
+//                 }
+//             }
+
+//             // Update the total error
+//             synchronized (MultiThreaded.class) {
+//                 iterations++; // Increment iteration count
+//                 // Check if total error is within acceptable limits to stop iteration
+//                 if (totalError < errorThreshold)
+//                     break;
+//             }
+//         }
+
+//         // Print results
+//         System.out.println("Type: Multi-threaded; Size = " + size);
+//         System.out.println("Total Error = " + totalError);
+//         System.out.println("Average matrix Value = " + getAverageTemp());
+//         System.out.println("Number of Iterations: " + iterations);
+//         printMatrix(); // Print the final temperature matrix
+//     }
+
+//     public double getAverageTemp() {
+//         double sum = 0;
+
+//         for (double[] row : matrix) {
+//             for (double temp : row) {
+//                 sum += temp;
+//             }
+//         }
+
+//         int totalSize = size * size;
+//         return sum / (totalSize);
+//     }
+
+//     public void printMatrix() {
+//         for (int i = 0; i < size; i++) {
+//             for (int j = 0; j < size; j++) {
+//                 System.out.printf("%d ", (int) Math.round(matrix[i][j]));
+//             }
+//             System.out.println();
+//         }
+//     }
+
+//     public static void main(String[] args) {
+//         int matrixSize = 25;
+//         long startTime = System.currentTimeMillis(); // Record start time
+//         MultiThreaded test = new MultiThreaded(matrixSize);
+//         test.run();
+//         long endTime = System.currentTimeMillis(); // Record end time
+//         long elapsedTime = endTime - startTime;
+//         System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
+//     }
+// }
+

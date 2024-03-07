@@ -1,0 +1,140 @@
+
+public class SingleThread {
+
+    public static void main(String[] args) {
+        int matrixSize = 20; // matrix size
+        int[][] matrix = initializeBorder(matrixSize);
+        printMatrix(matrix);
+
+        
+        double error = Double.POSITIVE_INFINITY;
+        int iterations = 0;
+
+        long startTime = System.currentTimeMillis(); // Record start time
+
+        while (error > 5.0) {
+            int[][] newMatrix = calculateAverage(matrix);
+            error = calculateError(matrix, newMatrix);
+            matrix = newMatrix;
+            iterations++;
+        }
+        
+        long endTime = System.currentTimeMillis(); // Record end time
+
+        double averageTemperature = calculateAverageTemperature(matrix);
+        System.out.println("Single-threaded solution:");
+        System.out.println("Grid size: " + matrixSize);
+        System.out.println("Total grid error: " + error);
+        System.out.println("Grid average temperature: " + averageTemperature);
+        System.out.println("Number of iterations: " + iterations);
+        printMatrix(matrix);
+        printElapsedTime(startTime, endTime);
+    }
+
+    private static void printElapsedTime(long startTime, long endTime) {
+        long elapsedTime = endTime - startTime;
+        System.out.println("Elapsed time: " + elapsedTime + " milliseconds");
+    }
+
+    private static void printMatrix(int[][] matrix) {
+        for (int[] row : matrix) {
+            for (int value : row) {
+                System.out.print(value + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+    
+
+    private static int[][] initializeBorder(int size) {
+        int[][] matrix = new int[size][size];
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+
+        for (int i = 1; i < size - 1; i++) {
+            matrix[0][i] = 30; // Top edge
+            matrix[rows - 1][i] = 75; // Bottom edge
+            matrix[i][0] = 15; // Left edge
+            matrix[i][cols - 1] = 72; // Right edge
+        }
+
+        // Initialize corner cells with the given neighbor cells
+        matrix[0][0] = (15 + 30) / 2; // Top-left corner
+        matrix[0][cols - 1] = (30 + 72) / 2; // Top-right corner
+        matrix[rows - 1][0] = (15 + 75) / 2; // Bottom-left corner
+        matrix[rows - 1][cols - 1] = (75 + 72) / 2; // Bottom-right corner
+
+        // for (int i = 1; i < size - 1; i++) {
+        //     // Top border
+        //     matrix[0][i] = (int) (Math.random() * 100);
+        //     // Bottom border
+        //     matrix[size - 1][i] = (int) (Math.random() * 100);
+        //     // Left border
+        //     matrix[i][0] = (int) (Math.random() * 100);
+        //     // Right border
+        //     matrix[i][size - 1] = (int) (Math.random() * 100);
+        // }
+
+        // matrix[0][0] = (matrix[0][1] + matrix[1][0]) / 2;
+        // matrix[0][cols - 1] = (matrix[0][cols - 2] + matrix[1][cols - 1]) / 2;
+        // matrix[rows - 1][0] = (matrix[rows - 2][0] + matrix[rows - 1][1]) / 2;
+        // matrix[rows - 1][cols - 1] = (matrix[rows - 2][cols - 1] + matrix[rows - 1][cols - 2]) / 2;
+
+        return matrix;
+    }
+
+
+    private static int[][] calculateAverage(int[][] matrix) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        int[][] newMatrix = new int[rows][cols];
+    
+        // Copy the initial borders to the new matrix
+        for (int i = 0; i < rows; i++) {
+            newMatrix[i][0] = matrix[i][0];
+            newMatrix[i][cols - 1] = matrix[i][cols - 1];
+        }
+        for (int j = 0; j < cols; j++) {
+            newMatrix[0][j] = matrix[0][j];
+            newMatrix[rows - 1][j] = matrix[rows - 1][j];
+        }
+    
+        //Calculate the average of cells in the immediate north, south, east, and west positions for interior cells
+        for (int i = 1; i < rows - 1; i++) {
+            for (int j = 1; j < cols - 1; j++) {
+                if(newMatrix[i][j] == 0)
+                   newMatrix[i][j] = (matrix[i - 1][j] + matrix[i][j - 1] + matrix[i][j + 1] + matrix[i + 1][j]) / 4;
+            }
+        }
+
+        return newMatrix;
+    }
+    
+    
+    private static double calculateError(int[][] matrix1, int[][] matrix2) {
+        double error = 0.0;
+        int rows = matrix1.length;
+        int cols = matrix1[0].length;
+
+        for (int i = 1; i < rows - 1; i++) {
+            for (int j = 1; j < cols - 1; j++) {
+                error += Math.abs(matrix1[i][j] - matrix2[i][j]);
+            }
+        }
+
+        return error;
+    }
+
+    private static double calculateAverageTemperature(int[][] matrix) {
+        int total = 0;
+        int count = 0;
+        for (int[] row : matrix) {
+            for (int value : row) {
+                total += value;
+                count++;
+            }
+        }
+        return (double) total / count;
+    }
+}
